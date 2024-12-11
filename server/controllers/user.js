@@ -1466,7 +1466,7 @@ async function countWebVisit(req, res) {
         })
 
         success = true;
-        return res.status(200).json({ success, Data: "Successfully Add Member" })
+        return res.status(200).json({ success, Data: "Success" })
 
     } catch (error) {
         console.log(error.message);
