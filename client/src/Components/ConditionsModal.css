@@ -1,0 +1,97 @@
+.conditionModal {
+    position: fixed;
+    top: 20px;
+    background-color: transparent;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.conditions {
+    width: 800px;
+    background-color: white;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border: 2px solid red;
+}
+
+.conditionInner {
+    /* background-color: blue; */
+    overflow-y: scroll;
+    height: 80vh;
+    margin-top: 20px;
+    padding: 0px 20px;
+}
+
+.conditions h3 {
+    font-size: 22px;
+    margin-bottom: 0px;
+}
+
+.conditions h4 {
+    margin-top: 20px;
+}
+
+.conditions h4:first-child {
+    margin-top: 0px;
+}
+
+.conditions ul {
+    padding: 0px 30px;
+}
+
+
+.conditions ul li {
+    margin: 5px 0px;
+    /* background-color: red; */
+}
+
+.conditionInnerList {
+    margin-bottom: 10px;
+}
+
+.conditionInnerList li {
+    margin: 0px 40px;
+}
+
+.conditionsHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.conditionsHeader i {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.hideConditionModal {
+    display: none;
+}
+
+
+/* --------------- Media Queries */
+@media (max-width: 930px) {
+    .conditions {
+        width: 600px;
+    }
+}
+
+@media (max-width: 650px) {
+    .conditions {
+        width: 90vw;
+        padding: 10px 10px;
+    }
+
+    .conditionInner {
+        height: 70vh;
+        padding: 0px 10px;
+    }
+
+    .conditions ul li li {
+        padding: 5px -40px;
+    }
+}

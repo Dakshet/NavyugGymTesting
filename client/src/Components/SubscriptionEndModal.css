@@ -1,0 +1,152 @@
+.subscriptionEndModal {
+    position: fixed;
+    top: 0px;
+    /* background-color: blue; */
+    backdrop-filter: blur(5px);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    margin-left: -5.9vw;
+    /* background-color: red; */
+}
+
+.subscriptionEndModalInner {
+    width: 400px;
+    height: 80vh;
+    background-color: white;
+    border-radius: 20px;
+    border: 2px solid red;
+    padding: 10px 20px;
+    /* background-color: blue; */
+    overflow: auto;
+}
+
+.subscriptionEndModalInnerBox {
+    overflow-x: scroll;
+    overflow-y: scroll;
+    /* background-color: aliceblue; */
+}
+
+
+.subscriptionEndModalInner::-webkit-scrollbar,
+.subscriptionEndModalInnerBox::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+}
+
+
+.subscriptionEndModalInner::-webkit-scrollbar-track,
+.subscriptionEndModalInnerBox::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.subscriptionEndModalInner ::-webkit-scrollbar-thumb,
+.subscriptionEndModalInnerBox ::-webkit-scrollbar-thumb {
+    background-color: transparent;
+}
+
+
+
+/* .adminPannelModalInnerBox {
+    overflow-y: scroll;
+
+} */
+
+.subscriptionEndModalInner i {
+    float: right;
+    font-size: 30px;
+    cursor: pointer;
+    margin-left: -30px;
+}
+
+
+.subscriptionEndModalInner img {
+    border-radius: 50%;
+    border: 3px solid red;
+    width: 200px;
+    height: 200px;
+    margin: 20px auto;
+    display: block;
+}
+
+
+.subscriptionEndModalInner h4,
+.subscriptionEndModalInner h5,
+.subscriptionEndModalInner h6 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: 400;
+}
+
+
+.subscriptionEndModalInner h4 span,
+.subscriptionEndModalInner h5 span {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+
+.subscriptionEndModalInner h6 span {
+    color: red;
+    font-weight: 800;
+}
+
+.subscriptionEndModalInner .combinationData {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.subscriptionEndModalInner .combinationData h6 {
+    margin-right: 30px;
+    /* background-color: blue; */
+}
+
+
+.hideSubscriptionEndModal {
+    display: none;
+}
+
+
+/* --------------- Media Queries */
+
+@media (max-width: 1125px) {
+    .subscriptionEndModal {
+        margin-left: -11vw;
+    }
+}
+
+@media (max-width: 800px) {
+    .subscriptionEndModal {
+        margin-left: -12vw;
+    }
+}
+
+@media (max-width: 650px) {
+    .subscriptionEndModal {
+        margin-left: -4.5vw;
+    }
+}
+
+@media (max-width: 430px) {
+    .subscriptionEndModalInner {
+        width: 350px;
+    }
+}
+
+@media (max-width: 370px) {
+    .subscriptionEndModal {
+        margin-left: -4.5vw;
+    }
+
+    .subscriptionEndModalInner {
+        width: 90vw;
+    }
+
+    .subscriptionEndModalInner img {
+        margin-left: 8vw;
+    }
+}

@@ -1,0 +1,147 @@
+.membershipPannel {
+    width: 100%;
+    min-height: 100vh;
+    /* background-color: blueviolet; */
+    padding: 30px 4%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+
+.membershipPannel h1 {
+    font-size: 40px;
+    color: red;
+    margin-bottom: 30px;
+}
+
+.membershipPannel hr {
+    width: 90%;
+    border: none;
+    outline: none;
+    background-color: red;
+    height: 2px;
+}
+
+.membershipPannelBox {
+    /* background-color: blanchedalmond; */
+    width: 100%;
+    /* min-height: 100vh; */
+    display: flex;
+    flex-wrap: wrap;
+    padding: 30px;
+    /* overflow-x: scroll; */
+}
+
+
+
+
+
+/* ---- AdminPannelInner */
+
+.deadlinePannelInner {
+    /* background-color: red; */
+    padding: 20px;
+    display: block;
+    border: 2px solid red;
+    margin: 30px 2.5vw 20px;
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 30px;
+    flex-basis: 44%;
+    cursor: pointer;
+    background-color: white;
+}
+
+
+.deadlinePannelInnerBox h5 {
+    font-size: 20px;
+    margin-bottom: 3px;
+}
+
+.deadlinePannelInnerBox h6 {
+    font-size: 16px;
+    margin-bottom: 4px;
+}
+
+.deadlinePannelInnerBox h6 span {
+    color: red;
+}
+
+/* .deadlinePannelInnerBox div {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+} */
+
+
+
+/* -------------- Media Queries */
+
+@media (max-width:1125px) {
+    .membershipPannel h1 {
+        font-size: 30px;
+    }
+
+    .membershipPannelBox {
+        width: 90%;
+        /* background-color: black; */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .deadlinePannelInner {
+        /* background-color: red; */
+        width: 92%;
+    }
+}
+
+@media (max-width:650px) {
+
+    .membershipPannel {
+        padding: 30px 4%;
+    }
+
+    .membershipPannel hr {
+        width: 99%;
+    }
+
+    .membershipPannelBox {
+        padding: 30px 0px;
+    }
+
+    .membershipPannelBox {
+        width: 99%;
+        /* background-color: black; */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .deadlinePannelInner {
+        /* background-color: red; */
+        width: 100%;
+        margin: 20px 0px 20px;
+    }
+
+
+    .deadlinePannelInnerBox h5 {
+        font-size: 17px;
+    }
+
+    .deadlinePannelInnerBox h6 {
+        font-size: 15px;
+    }
+
+}
+
+
+@media (max-width:420px) {
+
+    .membershipPannel h1 {
+        margin-bottom: 20px;
+        font-size: 25px;
+    }
+
+    .membershipPannel hr {
+        margin-bottom: -20px;
+    }
+}

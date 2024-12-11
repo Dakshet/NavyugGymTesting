@@ -1,0 +1,40 @@
+.waiting {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 80vh;
+    width: 100%;
+    padding: 0px 2%;
+    text-align: center;
+}
+
+.waiting h2 {
+    font-size: 60px;
+    color: red;
+}
+
+.waiting p {
+    font-weight: 800;
+    margin-top: 10px;
+}
+
+
+/* ------------------ Media Queries */
+@media (max-width:740px) {
+    .waiting h2 {
+        font-size: 40px;
+    }
+}
+
+@media (max-width:500px) {
+    .waiting h2 {
+        font-size: 35px;
+    }
+}
+
+@media (max-width:400px) {
+    .waiting h2 {
+        font-size: 35px;
+    }
+}

@@ -1,0 +1,223 @@
+.adminPanel {
+    width: 100%;
+    min-height: 100vh;
+    padding: 30px 4%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+
+.adminPanel h1 {
+    font-size: 40px;
+    color: red;
+    margin-bottom: 30px;
+}
+
+.adminPanel hr {
+    width: 90%;
+    border: none;
+    outline: none;
+    background-color: red;
+    height: 2px;
+}
+
+.adminPanelBox {
+    /* background-color: blanchedalmond; */
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    padding: 30px;
+    /* overflow-x: scroll; */
+}
+
+
+
+
+
+/* ---- AdminPannelInner */
+
+.adminPannelInner {
+    /* background-color: red; */
+    padding: 20px;
+    display: block;
+    border: 2px solid red;
+    margin: 30px 2.5vw 70px;
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.3);
+    border-radius: 30px;
+    flex-basis: 44%;
+    background-color: white;
+}
+
+
+.adminPannelInnerBox h5 {
+    cursor: pointer;
+    font-size: 20px;
+    margin-bottom: 3px;
+}
+
+.adminPannelInnerBox h6 {
+    font-size: 16px;
+    margin-bottom: 4px;
+    cursor: pointer;
+}
+
+.adminPannelInnerBox form {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.adminPannelInnerBox form .formInnerSelectBox {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-bottom: 10px;
+}
+
+.adminPannelInnerBox form .formInnerSelectBox div {
+    margin-right: 3vw;
+}
+
+
+.adminPannelInnerBox form label,
+.adminPannelInnerBox form select {
+    font-size: 15px;
+}
+
+.adminPannelInnerBox form label {
+    margin-right: 0.4vw;
+}
+
+.adminPannelInnerBox form .addFormBtn {
+    position: absolute;
+    right: 30px;
+    bottom: 0px;
+    top: 65px;
+}
+
+.addFormBtn .adminPannelBtn {
+    background-color: white;
+    color: black;
+    border: 2px solid red;
+    border-top: 0px;
+    border-radius: 0px 0px 20px 20px;
+    box-shadow: 10px 10px 10px rgba(0, 0, 0, 0.3);
+}
+
+.adminPannelInnerBox form .addFormBtn button:hover {
+    background-color: black;
+    color: white;
+}
+
+.adminPannelInnerBox img {
+    width: 300px;
+    height: 300px;
+}
+
+
+
+
+/* -------------- Media Queries */
+
+@media (max-width:1335px) {
+
+    .adminPannelInnerBox form .addFormBtn {
+        top: 55px;
+    }
+
+    .adminPannelInnerBox form .addFormBtn button {
+        margin: 20.5px 10px;
+    }
+}
+
+@media (max-width:1125px) {
+    .adminPanel h1 {
+        font-size: 30px;
+    }
+
+    .adminPanelBox {
+        width: 90%;
+        /* background-color: black; */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .adminPannelInner {
+        /* background-color: red; */
+        width: 92%;
+    }
+}
+
+@media (max-width:650px) {
+
+    .adminPanel {
+        padding: 30px 4%;
+    }
+
+    .adminPanel hr {
+        width: 99%;
+    }
+
+    .adminPanelBox {
+        padding: 30px 0px;
+    }
+
+    .adminPanelBox {
+        width: 99%;
+        /* background-color: black; */
+        display: flex;
+        flex-direction: column;
+    }
+
+    .adminPannelInner {
+        /* background-color: red; */
+        width: 100%;
+        margin: 30px 0px 70px;
+    }
+
+
+    .adminPannelInnerBox h5 {
+        font-size: 17px;
+    }
+
+    .adminPannelInnerBox h6 {
+        font-size: 15px;
+    }
+}
+
+
+@media (max-width:420px) {
+
+
+    .adminPanel h1 {
+        margin-bottom: 20px;
+        font-size: 25px;
+
+    }
+
+    .adminPanel hr {
+        margin-bottom: -20px;
+    }
+
+    .adminPannelInnerBox form .formInnerSelectBox {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .adminPannelInnerBox form .formInnerSelectBox div {
+        margin-bottom: 10px;
+    }
+
+
+    .adminPannelInnerBox form .addFormBtn {
+        top: 90px;
+        right: 20px;
+    }
+
+
+    .addFormBtn .adminPannelBtn {
+        padding: 10px 20px;
+    }
+}

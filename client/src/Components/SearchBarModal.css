@@ -1,0 +1,145 @@
+.searchBarModal {
+    position: fixed;
+    top: 0px;
+    /* background-color: blue; */
+    backdrop-filter: blur(5px);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    margin-left: -5.9vw;
+    /* background-color: red; */
+}
+
+.searchBarModalInner {
+    width: 400px;
+    height: 80vh;
+    background-color: white;
+    border-radius: 20px;
+    border: 2px solid red;
+    padding: 10px 20px;
+    /* background-color: blue; */
+    overflow: auto;
+}
+
+.searchBarModalInnerBox {
+    overflow-x: scroll;
+    overflow-y: scroll;
+}
+
+
+.searchBarModalInner::-webkit-scrollbar,
+.searchBarModalInnerBox::-webkit-scrollbar {
+    width: 2px;
+    height: 2px;
+}
+
+
+.searchBarModalInner::-webkit-scrollbar-track,
+.searchBarModalInnerBox::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+
+.searchBarModalInner::-webkit-scrollbar-thumb,
+.searchBarModalInnerBox ::-webkit-scrollbar-thumb {
+    background-color: transparent;
+}
+
+.searchBarModalInner i {
+    float: right;
+    font-size: 30px;
+    cursor: pointer;
+    margin-left: -30px;
+}
+
+
+.searchBarModalInner img {
+    border-radius: 50%;
+    border: 3px solid red;
+    width: 200px;
+    height: 200px;
+    margin: 20px auto;
+    display: block;
+}
+
+
+.searchBarModalInner h4,
+.searchBarModalInner h5,
+.searchBarModalInner h6 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: 400;
+}
+
+
+.searchBarModalInner h4 span,
+.searchBarModalInner h5 span {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+
+.searchBarModalInner h6 span {
+    color: red;
+    font-weight: 800;
+}
+
+.searchBarModalInner .combinationData {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.searchBarModalInner .combinationData h6 {
+    margin-right: 30px;
+    /* background-color: blue; */
+}
+
+
+.hideSearchBarModal {
+    display: none;
+}
+
+
+/* --------------- Media Queries */
+
+@media (max-width: 1125px) {
+    .searchBarModal {
+        margin-left: -11vw;
+    }
+}
+
+@media (max-width: 800px) {
+    .searchBarModal {
+        margin-left: -12vw;
+    }
+}
+
+@media (max-width: 650px) {
+    .searchBarModal {
+        margin-left: -4.5vw;
+    }
+}
+
+@media (max-width: 430px) {
+    .searchBarModalInner {
+        width: 350px;
+    }
+}
+
+@media (max-width: 370px) {
+    .searchBarModal {
+        margin-left: -4.5vw;
+    }
+
+    .searchBarModalInner {
+        width: 90vw;
+    }
+
+    .searchBarModalInner img {
+        margin-left: 8vw;
+    }
+}

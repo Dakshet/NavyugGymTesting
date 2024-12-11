@@ -1,0 +1,118 @@
+.admin {
+    width: 100%;
+    min-height: 100vh;
+    background: url("../Images/37.jpg");
+    background-position: center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* background-color: blue; */
+    margin-top: -120px;
+}
+
+.admin .adminForm {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.adminForm form {
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    width: 570px;
+    padding: 30px 30px;
+    border-radius: 30px;
+    margin-top: 150px;
+    border: 3px solid red;
+    margin-bottom: 70px;
+    box-shadow: 10px 10px 20px rgba(19, 18, 18, 0.9);
+}
+
+.adminForm form label,
+.adminForm form input {
+    display: block;
+    /* width: 440px; */
+    color: white;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.adminForm form label {
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.adminForm form input {
+    border: none;
+    outline: none;
+    resize: none;
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    color: black;
+}
+
+.formBtn {
+    width: 100%;
+    margin-top: 50px;
+}
+
+
+
+/* -------------------- Media Queries */
+
+@media (max-width:650px) {
+    .adminForm form {
+        width: 450px;
+        padding: 20px 20px;
+    }
+}
+
+@media (max-width:500px) {
+    .adminForm form {
+        width: 400px;
+        padding: 20px 20px;
+    }
+}
+
+@media (max-width:420px) {
+    .adminForm form {
+        width: 350px;
+        padding: 10px 15px 20px;
+        margin-top: 130px;
+    }
+
+    .adminForm form label,
+    .adminForm form input {
+        margin-top: 10px;
+    }
+
+    .formBtn {
+        margin-top: 40px;
+    }
+}
+
+@media (max-width: 380px) {
+    .adminForm form {
+        width: 330px;
+        padding: 20px 15px 20px;
+        margin-top: 110px;
+    }
+
+}
+
+@media (max-width: 340px) {
+    .adminForm form {
+        width: 310px;
+        padding: 20px 15px 20px;
+        margin-top: 110px;
+    }
+
+}

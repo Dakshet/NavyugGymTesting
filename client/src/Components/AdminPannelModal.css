@@ -1,0 +1,144 @@
+.adminPannelModal {
+    position: fixed;
+    top: 0px;
+    /* background-color: blue; */
+    backdrop-filter: blur(5px);
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    margin-left: -5.9vw;
+}
+
+.adminPannelModalInner {
+    width: 400px;
+    height: 80vh;
+    background-color: white;
+    border-radius: 20px;
+    border: 2px solid red;
+    padding: 10px 20px;
+    overflow: auto;
+}
+
+
+.adminPannelModalInnerBox {
+    overflow-x: scroll;
+    overflow-y: scroll;
+    /* background-color: aliceblue; */
+}
+
+
+
+.adminPannelModalInner::-webkit-scrollbar,
+.adminPannelModalInnerBox::-webkit-scrollbar {
+    width: 10px;
+}
+
+
+.adminPannelModalInner::-webkit-scrollbar-track,
+.adminPannelModalInnerBox::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+.adminPannelModalInner::-webkit-scrollbar-thumb,
+.adminPannelModalInnerBox::-webkit-scrollbar-thumb {
+    background-color: transparent;
+}
+
+
+
+/* .adminPannelModalInnerBox {
+    overflow-y: scroll;
+
+} */
+
+.adminPannelModalInner i {
+    float: right;
+    font-size: 30px;
+    cursor: pointer;
+    margin-left: -30px;
+}
+
+
+.adminPannelModalInner img {
+    border-radius: 50%;
+    border: 3px solid red;
+    width: 200px;
+    height: 200px;
+    margin: 20px auto;
+    display: block;
+}
+
+.adminPannelModalInner h4,
+.adminPannelModalInner h5,
+.adminPannelModalInner h6 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: 400;
+}
+
+.adminPannelModalInner h4 span,
+.adminPannelModalInner h5 span {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+
+.adminPannelModalInner .combinationData {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.adminPannelModalInner .combinationData h6 {
+    margin-right: 30px;
+    /* background-color: blue; */
+}
+
+
+.hideAdminPannelModal {
+    display: none;
+}
+
+
+/* --------------- Media Queries */
+
+@media (max-width: 1125px) {
+    .adminPannelModal {
+        margin-left: -11vw;
+    }
+}
+
+@media (max-width: 800px) {
+    .adminPannelModal {
+        margin-left: -12vw;
+    }
+}
+
+@media (max-width: 650px) {
+    .adminPannelModal {
+        margin-left: -4.5vw;
+    }
+}
+
+@media (max-width: 430px) {
+    .adminPannelModalInner {
+        width: 350px;
+    }
+}
+
+@media (max-width: 370px) {
+    .adminPannelModal {
+        margin-left: -4.5vw;
+    }
+
+    .adminPannelModalInner {
+        width: 90vw;
+    }
+
+    .adminPannelModalInner img {
+        margin-left: 8vw;
+    }
+}

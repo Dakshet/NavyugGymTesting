@@ -1,0 +1,83 @@
+.adminHome {
+    width: 100%;
+    min-height: 100vh;
+    /* background-color: blueviolet; */
+    padding: 30px 13%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+
+
+.adminHomeBox {
+    width: 90%;
+}
+
+.adminHomeBox h1 {
+    font-size: 40px;
+    color: black;
+    text-align: center;
+    margin-bottom: 50px;
+    font-weight: 900;
+}
+
+.adminHomeBox h5 {
+    padding: 10px 30px;
+    font-size: 18px;
+    background-color: black;
+    color: red;
+    display: inline-block;
+    border-top-left-radius: 40px;
+    border-top-right-radius: 40px;
+}
+
+.adminHomeBox hr {
+    width: 100%;
+    border: none;
+    outline: none;
+    background-color: black;
+    height: 4px;
+}
+
+.adminHomeBoxInner {
+    padding: 20px;
+    margin-bottom: 40px;
+}
+
+.adminHomeBoxInner h6 {
+    font-size: 18px;
+}
+
+.adminHomeBoxInner h6 span {
+    color: red;
+}
+
+
+/* ------------------- Media Queries */
+
+@media (max-width:560px) {
+    .adminHome {
+        padding: 30px 4%;
+    }
+}
+
+@media (max-width:420px) {
+    .adminHomeBox h1 {
+        font-size: 33px;
+    }
+}
+
+@media (max-width:380px) {
+    .adminHome {
+        padding: 30px 1%;
+    }
+
+    .adminHomeBox h1 {
+        font-size: 30px;
+    }
+
+    .adminHomeBoxInner {
+        padding: 20px 10px;
+    }
+}
