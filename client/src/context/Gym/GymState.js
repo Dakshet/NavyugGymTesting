@@ -520,8 +520,8 @@ const GymState = (props) => {
     const countWebVisit = async () => {
 
         try {
-            const response = await fetch(`${host}/user/admin/visitdata`, {
-                // const response = await fetch(`https://navyug-gym-testing.vercel.app/user/admin/visitdata`, {
+            // const response = await fetch(`${host}/user/admin/visitdata`, {
+            const response = await fetch(`https://navyug-gym-testing.vercel.app/user/admin/visitdata`, {
                 method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
