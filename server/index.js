@@ -8,7 +8,7 @@ const cors = require("cors");
 //Variables
 const app = express();
 const PORT = process.env.PORT || 4000;
-const FRONTEND_URL = process.env.FRONTEND_URL || "https://navyug-gym-frontend.vercel.app";
+const FRONTEND_URL = process.env.FRONTEND_URL || "https://navyug-gym-testing-m.vercel.app";
 
 
 
