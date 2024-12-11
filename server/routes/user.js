@@ -25,7 +25,7 @@ router.get("/admin/homedata", fetchUser, fetchHomeData);
 router.get("/admin/feesend", fetchUser, feesSubscriptionEndData);
 router.get("/admin/fetchmonthwise/:month", fetchUser, fetchDataMonthWise)
 router.get("/admin/fetchdays", fetchUser, fetchDaysForSubscriptionEnd)
-router.put("/admin/visitdata", countWebVisit)
+router.get("/admin/visitdata", countWebVisit)
 
 
 module.exports = router;
