@@ -523,11 +523,9 @@ const GymState = (props) => {
             const response = await fetch(`${host}/user/admin/visitdata`, {
                 // const response = await fetch(`https://navyug-gym-testing.vercel.app/user/admin/visitdata`, {
                 method: "PUT",
-                // headers: {
-                //     "Content-Type": "application/json",
-                //     // "auth_token": localStorage.getItem("gymdata")
-                //     // "auth_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiODEwNDEzMDE3NiJ9LCJpYXQiOjE3MzA5MDM0MjN9.Af9xlNcXZfd7k2Ycdao3M8FoEnfKcv3plTHwCV_jPgI"
-                // }
+                headers: {
+                    "Content-Type": "application/json"
+                }
             })
 
             if (response.ok) {
