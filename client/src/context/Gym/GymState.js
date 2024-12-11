@@ -529,7 +529,9 @@ const GymState = (props) => {
             })
 
             if (response.ok) {
-                await response.json();
+                const json = await response.json();
+
+                console.log(json);
 
             }
             else {
