@@ -858,7 +858,6 @@ How to Renew Your Membership:
                         - Mahesh Wagh: +91 8291616435
                         - Suresh Tambe: +91 9870216612
                         - Santosh Mahaprolkar: +91 9969087553
-                        - Piyush Londhe: +91 8355801745
                 
 We appreciate your commitment to fitness and look forward to supporting you on your journey at Navyug Gym. Don’t hesitate to reach out if you have any questions or need assistance.
     
@@ -883,8 +882,9 @@ How to Renew Your Membership:
     - Contact Us: If you have any questions, please reach out to us via email at navyuggym@gmail.com or contact our team directly:
                         - Mahesh Wagh: +91 8291616435
                         - Suresh Tambe: +91 9870216612
-                        - Santosh Mahaprolkar: +91 9969087553
-                        - Piyush Londhe: +91 8355801745
+                        - Santosh Mahaprolkar: +91 9969087553'
+
+To renew your subscription online, please visit our website at [www.navyuggym.in](http://www.navyuggym.in) and fill out the form provided.                      
                     
 We appreciate your commitment to fitness and look forward to supporting you on your journey at Navyug Gym. Don’t hesitate to reach out if you have any questions or need assistance.
         
@@ -1081,7 +1081,6 @@ Here are the next steps and some important details:
                     - Mahesh Wagh: +91 8291616435
                     - Suresh Tambe: +91 9870216612
                     - Santosh Mahaprolkar: +91 9969087553
-                    - Piyush Londhe: +91 8355801745
 
 What to Bring on Your First Day:
 - Gym attire and any personal equipment you might need.
@@ -1404,10 +1403,6 @@ async function fetchDataMonthWise(req, res) {
 
 
 
-
-
-
-
 // Fetch days for subscription end
 async function fetchDaysForSubscriptionEnd(req, res) {
     try {
@@ -1444,7 +1439,6 @@ function getAlphabetFromNumber(num) {
 // Count web visit
 async function countWebVisit(req, res) {
     try {
-
 
         let adminData = await fetchAdminData();
         // Update data for sending email to Main Admin
