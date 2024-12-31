@@ -972,7 +972,7 @@ async function feesSubscriptionEndData(req, res) {
                             })
                         response = await sheets.spreadsheets.values.clear({
                             spreadsheetId,
-                            range: `UserData!A${item + 2}:P${item + 2} `,
+                            range: `UserData!A${item + 2}:Q${item + 2}`,
                         })
 
                     } catch (error) {
