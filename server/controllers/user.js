@@ -1315,7 +1315,7 @@ Navyug Gym Team
                 insiderMembers++;
                 actuallyMember.push(data[j]);
 
-            } else if (data[j][12] === "4000") {
+            } else if (data[j][12] === "5000") {
                 outsiderMembers++;
                 actuallyMember.push(data[j]);
             }
