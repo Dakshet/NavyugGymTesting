@@ -12,6 +12,7 @@ const { jsPDF } = require("jspdf");     // Import the jsPDF library
 require("jspdf-autotable"); // Import jsPDF autoTable plugin
 const TOKEN_EXPIRATION = "45m";     // Token will expire in 1 hour (use other formats like '2d', '10m', '365d' as needed
 let success = false;
+const bcrypt = require("bcryptjs")
 
 
 // Keys 
@@ -635,9 +636,10 @@ async function loginAdmin(req, res) {
 
         if (isMobileNoVerify) {
 
-            if (data[index][3] === password) {
-                isPasswordVerify = true;
-            }
+            // if (data[index][3] === password) {
+            //     isPasswordVerify = true;
+            // }
+            isPasswordVerify = await bcrypt.compare(password, data[index][7])
         }
         else {
             isMobileNoVerify = false;
