@@ -886,7 +886,7 @@ How to Renew Your Membership:
                         - Suresh Tambe: +91 9870216612
                         - Santosh Mahaprolkar: +91 9969087553'
 
-To renew your subscription online, please visit our website at [www.navyuggym.in](http://www.navyuggym.in) and fill out the form provided.                      
+To renew your subscription online, please visit our website at [www.navyuggym.in] and fill out the form provided.                      
                     
 We appreciate your commitment to fitness and look forward to supporting you on your journey at Navyug Gym. Don’t hesitate to reach out if you have any questions or need assistance.
         
