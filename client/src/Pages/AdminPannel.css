@@ -185,6 +185,11 @@
     .adminPannelInnerBox h6 {
         font-size: 15px;
     }
+
+    .adminPannelInnerBox form .addFormBtn button:hover {
+        background-color: white;
+        color: black;
+    }
 }
 
 
