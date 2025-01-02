@@ -1046,11 +1046,7 @@ async function acceptFeesPayment(req, res) {
         }
 
         // Here get Full Name
-        firstName = firstName.split(" ")[0].charAt(0).toUpperCase() + firstName.split(" ")[0].slice(1);
-
-        let lastName = fullInfo[0].split(" ")[1].charAt(0).toUpperCase() + fullInfo[0].split(" ")[1].slice(1);
-
-        let fullName = firstName + " " + lastName;
+        let fullName = fullInfo[0].split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
 
 
         // Full Name and meta data send to the pdf method.
