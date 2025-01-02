@@ -539,26 +539,57 @@ async function createUser(req, res) {
         const copyImageId = driveResponse.id;
 
 
-        // Add Date
-        const currentDate = new Date();
+        // // Add Date
+        // const currentDate = new Date();
 
-        // Get individual components:
+        // // Get individual components:
+        // const year = currentDate.getFullYear();
+        // const month = currentDate.getMonth() + 1; // Months are 0-indexed
+        // const day = currentDate.getDate();
+
+        // // Format the date:
+        // const formattedDate
+        //     = `${day.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${year}`;
+
+
+        // // After 1 year
+        // const currentbDate = new Date();
+        // currentbDate.setFullYear(currentbDate.getFullYear() + 1);
+        // const afterYear = currentbDate.getFullYear();
+        // const afterMonth = currentbDate.getMonth() + 1; // Months are 0-indexed
+        // const afterDay = currentbDate.getDate();
+        // const afterOneYearDate = `${afterDay.toString().padStart(2, '0')}-${afterMonth.toString().padStart(2, '0')}-${afterYear}`;
+
+
+        // Function to get current date in IST
+        function getIndianDate(offsetInMinutes = 330) {
+            const currentDate = new Date();
+            const indianDate = new Date(currentDate.getTime() + offsetInMinutes * 60 * 1000); // Offset in minutes
+            return indianDate;
+        }
+
+        // Get current date in IST
+        const currentDate = getIndianDate();
+
+        // Format current date in DD-MM-YYYY format
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth() + 1; // Months are 0-indexed
         const day = currentDate.getDate();
 
-        // Format the date:
-        const formattedDate
-            = `${day.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${year}`;
+        const formattedDate = `${day.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${year}`;
+        console.log("Current Date (IST):", formattedDate);
 
+        // After 1 year in IST
+        const afterOneYearDateObject = getIndianDate();
+        afterOneYearDateObject.setFullYear(afterOneYearDateObject.getFullYear() + 1);
 
-        // After 1 year
-        const currentbDate = new Date();
-        currentbDate.setFullYear(currentbDate.getFullYear() + 1);
-        const afterYear = currentbDate.getFullYear();
-        const afterMonth = currentbDate.getMonth() + 1; // Months are 0-indexed
-        const afterDay = currentbDate.getDate();
+        const afterYear = afterOneYearDateObject.getFullYear();
+        const afterMonth = afterOneYearDateObject.getMonth() + 1;
+        const afterDay = afterOneYearDateObject.getDate();
+
         const afterOneYearDate = `${afterDay.toString().padStart(2, '0')}-${afterMonth.toString().padStart(2, '0')}-${afterYear}`;
+        console.log("Date After 1 Year (IST):", afterOneYearDate);
+
 
 
         // Checking empty rows
