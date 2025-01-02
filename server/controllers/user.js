@@ -571,6 +571,8 @@ async function createUser(req, res) {
             }
         }
 
+        console.log(formattedDate);
+
 
         const sheets = await accessGoogleSheet();
         const auth = await getAuth();
