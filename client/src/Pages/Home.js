@@ -193,7 +193,7 @@ const Home = () => {
                                 <label htmlFor="email">Email</label>
                                 <input type="email" name='email' id='email' value={email} onChange={(e) => setEmail(e.target.value)} placeholder='Enter your correct Email Id' />
                                 <label htmlFor="mobileNo">Mobile Number</label>
-                                <input type="tel" name='mobileNo' id='mobileNo' value={mobileNo} onChange={handleMobileNoChange} placeholder="No spaces or +91" />
+                                <input type="tel" name='mobileNo' id='mobileNo' value={mobileNo} onChange={handleMobileNoChange} placeholder="No spaces or +91" required minLength={10} />
                                 <label htmlFor="address">Address</label>
                                 <textarea name="address" id="address" rows="4" value={address} onChange={(e) => setAddress(e.target.value)} ></textarea>
                                 <div className='adjustWidth'>

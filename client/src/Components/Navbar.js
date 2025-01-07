@@ -62,9 +62,9 @@ const Navbar = () => {
                     <Link to="/admin/home" className={`${showButtons ? "" : "hideBtn"}`}>
                         <button>Home</button>
                     </Link>
-                    {<Link to="/admin/add/panel" className={`${showButtons ? "" : "hideBtn"}`}>
+                    <Link to="/admin/add/panel" className={`${showButtons ? "" : "hideBtn"}`}>
                         <button>Membership Requests</button>
-                    </Link>}
+                    </Link>
                     <Link to="/admin/membership/data" className={`${showButtons ? "" : "hideBtn"}`}>
                         <button>Members Data</button>
                     </Link>
