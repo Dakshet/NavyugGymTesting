@@ -1,14 +1,13 @@
-import React, { useCallback, useEffect, useContext, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import "./Navbar.css"
 import logo from '../Images/logo1.jpg'
 import gymLogo from '../Images/gymlogo1.png'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import SearchBar from './SearchBar'
-import GymContext from '../context/Gym/GymContext'
 
 const Navbar = () => {
 
-    const { homeAdminData } = useContext(GymContext);
+    // const { homeAdminData } = useContext(GymContext);
 
     const navigate = useNavigate();
 
@@ -63,7 +62,7 @@ const Navbar = () => {
                     <Link to="/admin/home" className={`${showButtons ? "" : "hideBtn"}`}>
                         <button>Home</button>
                     </Link>
-                    {homeAdminData.authority === "YES" && <Link to="/admin/add/panel" className={`${showButtons ? "" : "hideBtn"}`}>
+                    {<Link to="/admin/add/panel" className={`${showButtons ? "" : "hideBtn"}`}>
                         <button>Membership Requests</button>
                     </Link>}
                     <Link to="/admin/membership/data" className={`${showButtons ? "" : "hideBtn"}`}>

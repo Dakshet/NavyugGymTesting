@@ -586,7 +586,7 @@ async function createUser(req, res) {
         const day = currentDate.getDate();
 
         const formattedDate = `${day.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${year}`;
-        console.log("Current Date (IST):", formattedDate);
+        // console.log("Current Date (IST):", formattedDate);
 
         // After 1 year in IST
         const afterOneYearDateObject = getIndianDate();
@@ -597,7 +597,7 @@ async function createUser(req, res) {
         const afterDay = afterOneYearDateObject.getDate();
 
         const afterOneYearDate = `${afterDay.toString().padStart(2, '0')}-${afterMonth.toString().padStart(2, '0')}-${afterYear}`;
-        console.log("Date After 1 Year (IST):", afterOneYearDate);
+        // console.log("Date After 1 Year (IST):", afterOneYearDate);
 
 
 
@@ -1263,7 +1263,7 @@ async function fetchHomeData(req, res) {
         let data = await fetchData();
         let adminData = await fetchAdminData();
         let adminFirstName;
-        let authority;
+        // let authority;
         let totalMembers = 0;
         let insiderMembers = 0;
         let outsiderMembers = 0;
@@ -1294,7 +1294,6 @@ async function fetchHomeData(req, res) {
             // Admin Verification
             if (adminData[i][2] === userId) {
                 adminFirstName = adminData[i][0].split(" ")[0]
-                authority = adminData[i][6];
                 break;
             }
         }
@@ -1384,7 +1383,7 @@ Navyug Gym Team
         totalMembers = actuallyMember.length;
 
         success = true;
-        return res.status(200).json({ success, Data: { adminFirstName, authority, totalMembers, insiderMembers, outsiderMembers, morningMembers, eveningMembers, membersBelowFifteen, fifteenToTwenty, twentyToThirty, membersAboveThirty } })
+        return res.status(200).json({ success, Data: { adminFirstName, totalMembers, insiderMembers, outsiderMembers, morningMembers, eveningMembers, membersBelowFifteen, fifteenToTwenty, twentyToThirty, membersAboveThirty } })
 
 
     } catch (error) {
@@ -1413,9 +1412,18 @@ async function fetchDataMonthWise(req, res) {
 
         for (let item = 0; item < data.length; item++) {
 
-            if (data[item][15] === "No" && data[item][11] === "Yes" && (data[item][5].split('-')[1]) === monthNum) {
+            // if (data[item][15] === "No" && data[item][11] === "Yes" && (data[item][5].split('-')[1]) === monthNum) {
 
-                monthWiseData.push(data[item])
+            //     monthWiseData.push(data[item])
+            // }
+
+            if (
+                data[item][15] === "No" &&
+                data[item][11] === "Yes" &&
+                (parseInt(data[item][5].split('-')[1], 10) === parseInt(monthNum, 10))
+            ) {
+                monthWiseData.push(data[item]);
+                // console.log(data[item])
             }
 
         }

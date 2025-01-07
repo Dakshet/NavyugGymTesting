@@ -73,6 +73,26 @@ const Home = () => {
 
 
 
+    const handleMobileNoChange = useCallback((e) => {
+
+        let value = e.target.value;
+
+        // Remove all spaces
+        value = value.replace(/\s+/g, '');
+
+        // Remove the +91 prefix if present
+        if (value.startsWith('+91')) {
+            value = value.slice(3);
+        }
+
+        // Ensure only the last 10 digits are kept (to handle invalid extra digits)
+        value = value.slice(-10);
+
+        setMobileNo(value);
+    }, []);
+
+
+
     const handleSubmitForm = useCallback(async (e) => {
         e.preventDefault();
 
@@ -171,9 +191,9 @@ const Home = () => {
                                 <label htmlFor="fName">Full Name</label>
                                 <input type="text" name='fName' id='fName' value={fName} onChange={(e) => setFName(e.target.value)} required />
                                 <label htmlFor="email">Email</label>
-                                <input type="email" name='email' id='email' value={email} onChange={(e) => setEmail(e.target.value)} />
+                                <input type="email" name='email' id='email' value={email} onChange={(e) => setEmail(e.target.value)} placeholder='Enter your correct Email Id' />
                                 <label htmlFor="mobileNo">Mobile Number</label>
-                                <input type="tel" name='mobileNo' id='mobileNo' value={mobileNo} onChange={(e) => setMobileNo(e.target.value)} />
+                                <input type="tel" name='mobileNo' id='mobileNo' value={mobileNo} onChange={handleMobileNoChange} placeholder="No spaces or +91" />
                                 <label htmlFor="address">Address</label>
                                 <textarea name="address" id="address" rows="4" value={address} onChange={(e) => setAddress(e.target.value)} ></textarea>
                                 <div className='adjustWidth'>

@@ -8,10 +8,10 @@ import { useNavigate } from 'react-router-dom'
 const AdminPannel = () => {
     const navigate = useNavigate();
 
-    const { homeAdminData, pendingData, setPendingData, fetchFeesPendingData } = useContext(GymContext)
+    const { pendingData, setPendingData, fetchFeesPendingData } = useContext(GymContext)
 
     useEffect(() => {
-        if (localStorage.getItem("gymdata") && homeAdminData.authority === "YES") {
+        if (localStorage.getItem("gymdata")) {
             fetchFeesPendingData();
         }
         else {
