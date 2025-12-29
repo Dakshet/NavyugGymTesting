@@ -1,0 +1,223 @@
+.maintenance-container {
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+.maintenance-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url("../Images/37.jpg") center/cover;
+    opacity: 0.1;
+    z-index: 0;
+}
+
+.maintenance-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    background: rgba(14, 14, 14, 0.85);
+    padding: 60px 40px;
+    border-radius: 30px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255, 0, 0, 0.3);
+    max-width: 700px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+}
+
+.maintenance-icon {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 30px;
+    color: #ff4444;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.maintenance-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+.maintenance-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.maintenance-message {
+    font-size: 1.1rem;
+    color: #e0e0e0;
+    line-height: 1.6;
+    margin-bottom: 40px;
+    padding: 0 20px;
+}
+
+.launch-date {
+    margin-bottom: 40px;
+    padding: 20px;
+    background: rgba(255, 68, 68, 0.1);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 68, 68, 0.3);
+}
+
+.launch-label {
+    font-size: 0.9rem;
+    color: #b0b0b0;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.launch-date-text {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #ff4444;
+    text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+.countdown-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 40px;
+    flex-wrap: wrap;
+}
+
+.countdown-item {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px 15px;
+    border-radius: 15px;
+    min-width: 80px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+}
+
+.countdown-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 5px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.countdown-label {
+    font-size: 0.75rem;
+    color: #b0b0b0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.countdown-separator {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #ff4444;
+    margin: 0 -5px;
+}
+
+.gym-brand {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ff4444;
+    text-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+    letter-spacing: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .maintenance-content {
+        padding: 40px 25px;
+    }
+
+    .maintenance-title {
+        font-size: 2rem;
+    }
+
+    .maintenance-message {
+        font-size: 1rem;
+    }
+
+    .launch-date-text {
+        font-size: 1.5rem;
+    }
+
+    .countdown-item {
+        min-width: 70px;
+        padding: 15px 10px;
+    }
+
+    .countdown-value {
+        font-size: 1.5rem;
+    }
+
+    .countdown-separator {
+        font-size: 1.5rem;
+        margin: 0 -3px;
+    }
+
+    .maintenance-icon {
+        width: 80px;
+        height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .maintenance-content {
+        padding: 30px 20px;
+        border-radius: 20px;
+    }
+
+    .maintenance-title {
+        font-size: 1.75rem;
+    }
+
+    .countdown-container {
+        gap: 10px;
+    }
+
+    .countdown-item {
+        min-width: 60px;
+        padding: 12px 8px;
+    }
+
+    .countdown-value {
+        font-size: 1.25rem;
+    }
+
+    .countdown-label {
+        font-size: 0.65rem;
+    }
+}
