@@ -1,7 +1,7 @@
 import './App.css';
 import Waiting from './Pages/Waiting';
-// import Home from './Pages/Home';
-import Maintenance from './Pages/Maintenance';
+import Home from './Pages/Home';
+// import Maintenance from './Pages/Maintenance';
 import {
   BrowserRouter as Router,
   Routes,
