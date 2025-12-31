@@ -74,8 +74,8 @@ const AdminPannelInner = ({ data, pendingData, setPendingData }) => {
                                 <label htmlFor="amount">Amount</label>
                                 <select name="amount" id="amount" value={amount} required onChange={(e) => setAmount(e.target.value)}>
                                     <option value="">Select Amount:</option>
-                                    <option value="2000">2000</option>
-                                    <option value="5000">5000</option>
+                                    <option value="3000">3000</option>
+                                    <option value="6000">6000</option>
                                 </select>
                             </div>
                             <div>
