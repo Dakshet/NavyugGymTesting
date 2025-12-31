@@ -1,7 +1,7 @@
 import './App.css';
 import Waiting from './Pages/Waiting';
-import Home from './Pages/Home';
-// import Maintenance from './Pages/Maintenance';
+// import Home from './Pages/Home';
+import Maintenance from './Pages/Maintenance';
 import {
   BrowserRouter as Router,
   Routes,
@@ -33,8 +33,8 @@ function App() {
           <ScrollToTop />
           <Routes>
 
-            {/* <Route path='/' element={<Maintenance />} /> */}
-            <Route path='/' element={<Home />} />
+            <Route path='/' element={<Maintenance />} />
+            {/* <Route path='/' element={<Home />} /> */}
             <Route path='/user/home' element={<Waiting />} />
             <Route path='/admin' element={<AdminLogin />} />
             <Route path='/admin/home' element={<AdminHome />} />
