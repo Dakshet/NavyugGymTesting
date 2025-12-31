@@ -33,8 +33,8 @@ function App() {
           <ScrollToTop />
           <Routes>
 
-            <Route path='/' element={<Maintenance />} />
-            {/* <Route path='/' element={<Home />} /> */}
+            {/* <Route path='/' element={<Maintenance />} /> */}
+            <Route path='/' element={<Home />} />
             <Route path='/user/home' element={<Waiting />} />
             <Route path='/admin' element={<AdminLogin />} />
             <Route path='/admin/home' element={<AdminHome />} />
