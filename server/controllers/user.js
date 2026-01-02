@@ -525,22 +525,31 @@ async function createUser(req, res) {
         // Fetch Data
         let data = await fetchData();
 
+        // Check if email already exists and find the row index
+        let existingUserIndex = -1;
         if (data.length > 0) {
-            if (data.some(row => row[1] === email)) {
-                return res.status(400).json({ success: false, Error: "User with this email id is already registered!" });
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].length > 0 && data[i][1] === email) {
+                    existingUserIndex = i;
+                    break;
+                }
             }
         }
-
-
-        // Accessing Google Drive
-        // let imageLinkShare = await accessGoogleDrive(req.file, email);
-        //         let imageLinkShree = imageLinkShare.imageLinkShree;
-        //         let copyImageId = imageLinkShare.copyImageId;
-
 
         // Upload to Google Drive directly using stream
         const file = req.file;
 
+        // If user exists, delete old image from Google Drive before uploading new one
+        if (existingUserIndex !== -1 && data[existingUserIndex][4]) {
+            try {
+                const auth = await getAuth();
+                const drive = google.drive({ version: "v3", auth });
+                await drive.files.delete({ fileId: data[existingUserIndex][4] });
+                console.log("Old image deleted from Google Drive");
+            } catch (error) {
+                console.log("Error deleting old image:", error.message);
+            }
+        }
 
         const driveResponse = await uploadToGoogleDrive(file.buffer, file.mimetype, `${email}.jpg`);
 
@@ -601,41 +610,49 @@ async function createUser(req, res) {
 
 
 
-        // Checking empty rows
-        let emptyIndex = 0;
-
-        for (let i = 0; i < data.length; i++) {
-            if (data[i].length === 0) {
-                emptyIndex = i + 1;
-                break;
-            }
-        }
-
-
         const sheets = await accessGoogleSheet();
         const auth = await getAuth();
         let response;
 
-
-        //Store user data in the database
-        if (emptyIndex !== 0) {
-            emptyIndex -= 1;
+        // If user exists, update the existing row with new data
+        if (existingUserIndex !== -1) {
+            // Update existing user row with new data and reset payment fields
             response = await sheets.spreadsheets.values.update({
                 spreadsheetId,
-                range: `UserData!A${emptyIndex + 2}`,
+                range: `UserData!A${existingUserIndex + 2}`,
                 valueInputOption: "USER_ENTERED",
                 resource: { values: [[fullName, email, mobileNo, address, copyImageId, formattedDate, afterOneYearDate, dOB, age, bloodGroup, workoutTime, "No", "", "", "No", "No"]] }
             })
-        }
+        } else {
+            // Checking empty rows for new user
+            let emptyIndex = 0;
 
-        else {
-            response = await sheets.spreadsheets.values.append({
-                auth,
-                spreadsheetId,
-                range: "UserData",  //Specify the start cell
-                valueInputOption: "USER_ENTERED",
-                resource: { values: [[fullName, email, mobileNo, address, copyImageId, formattedDate, afterOneYearDate, dOB, age, bloodGroup, workoutTime, "No", "", "", "No", "No"]] }
-            })
+            for (let i = 0; i < data.length; i++) {
+                if (data[i].length === 0) {
+                    emptyIndex = i + 1;
+                    break;
+                }
+            }
+
+            //Store user data in the database
+            if (emptyIndex !== 0) {
+                emptyIndex -= 1;
+                response = await sheets.spreadsheets.values.update({
+                    spreadsheetId,
+                    range: `UserData!A${emptyIndex + 2}`,
+                    valueInputOption: "USER_ENTERED",
+                    resource: { values: [[fullName, email, mobileNo, address, copyImageId, formattedDate, afterOneYearDate, dOB, age, bloodGroup, workoutTime, "No", "", "", "No", "No"]] }
+                })
+            }
+            else {
+                response = await sheets.spreadsheets.values.append({
+                    auth,
+                    spreadsheetId,
+                    range: "UserData",  //Specify the start cell
+                    valueInputOption: "USER_ENTERED",
+                    resource: { values: [[fullName, email, mobileNo, address, copyImageId, formattedDate, afterOneYearDate, dOB, age, bloodGroup, workoutTime, "No", "", "", "No", "No"]] }
+                })
+            }
         }
 
         success = true;
@@ -1346,15 +1363,39 @@ Navyug Gym Team
 
         for (let j = 0; j < data.length; j++) {
             // Member type: Insider or Outsider
-            if (data[j][12] === "2000") {
+            if (data[j][12] === "3000" || data[j][12] === "2000") {
                 insiderMembers++;
                 actuallyMember.push(data[j]);
 
-            } else if (data[j][12] === "5000") {
+            } else if (data[j][12] === "6000" || data[j][12] === "5000") {
                 outsiderMembers++;
                 actuallyMember.push(data[j]);
             }
+            // // Only count active members with payment accepted and not deleted
+            // // data[j][11] === "Yes" means payment is accepted
+            // // data[j][15] === "No" means member is not deleted/expired
+            // // data[j][12] is the membership fee (3000 for insider, 6000 for outsider)
+            // if (data[j].length !== 0 && data[j][11] === "Yes" && data[j][15] === "No") {
+            //     // Check if membership is still active (end date hasn't passed)
+            //     let endDate = data[j][6];
+            //     if (endDate) {
+            //         const [endDay, endMonth, endYear] = endDate.split("-").map(Number);
+            //         const endDeadlineDate = new Date(endYear, endMonth - 1, endDay);
+            //         const currentDateCheck = new Date(year, month - 1, day);
 
+            //         // Only count if membership hasn't expired
+            //         if (currentDateCheck.getTime() <= endDeadlineDate.getTime()) {
+            //             // Member type: Insider or Outsider
+            //             if (data[j][12] === "3000") {
+            //                 insiderMembers++;
+            //                 actuallyMember.push(data[j]);
+            //             } else if (data[j][12] === "6000") {
+            //                 outsiderMembers++;
+            //                 actuallyMember.push(data[j]);
+            //             }
+            //         }
+            //     }
+            // }
         }
 
         for (let j = 0; j < actuallyMember.length; j++) {
