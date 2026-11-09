@@ -331,102 +331,12 @@ async function createPdf(fullName, fullInfo, amount, userName) {
 
 
 
-// Method
-async function createAdminPDF(formattedDate) {
-    // Create a new instance of jsPDF
-    const doc = new jsPDF();
-    // Fetch the data
-    let data = await fetchData();
-    // Add metadata and title
-    doc.setFontSize(8);
-    doc.text(`(since 1954)`, 150, 20);
-    doc.setFontSize(25);
-    doc.setFont("helvetica", "bold");
-    doc.text("Navyug Gym Receipt", 60, 20);
-    doc.setFont("helvetica", "normal");
-    doc.setLineWidth(0.5);
-    doc.line(20, 28, 190, 28);
-    doc.setFontSize(10);
-    doc.text(`Date: ${formattedDate}`, 159, 37);
-    doc.setFontSize(8);
-    // Define starting Y position and page height
-    let startY = 70;
-    const pageHeight = doc.internal.pageSize.height;
-    // Process each record
-    const lineSpacing = 5; // Adjust spacing between lines
-    for (let i = 0; i < data.length; i++) {
-        // Check if adding the next block will overflow the page 
-        if (startY + (10 * lineSpacing) > pageHeight - 3) { // Leave a bottom margin
-            doc.addPage(); // Add a new page
-            startY = 4;   // Reset the Y position for the new page
-        }
-        doc.text(`Name: ${data[i][0]}       Email: ${data[i][1]}      Mobile No: ${data[i][2]}`, 20, startY);
-        startY += lineSpacing;
-        doc.text(`Address: ${data[i][3]}`, 20, startY);
-        startY += lineSpacing;
-        doc.text(`File: ${data[i][4]}       Start Date: ${data[i][5]}       End Date: ${data[i][6]}        Date Of Birth: ${data[i][7]}`, 20, startY);
-        startY += lineSpacing;
-        doc.text(`Age: ${data[i][8]}        Blood Group: ${data[i][9]}        Workout Time: ${data[i][10]}        Fees Paid: ${data[i][11]}        Amount: ${data[i][12]}        Fees Receiver: ${data[i][13]}`, 20, startY);
-        startY += lineSpacing;
-        doc.text(`Before 5 Days Mail Send: ${data[i][14]}               Last Mail: ${data[i][15]}`, 20, startY);
-        startY += lineSpacing + 8; // Add extra spacing after each record
-    }
-    // Save the PDF to a temporary location
-    const tempDir = require('os').tmpdir();
-    const outputPath = path.join(tempDir, "gym-admin-data.pdf");
-    const arrayBuffer = doc.output("arraybuffer");
-    const buffer = Buffer.from(arrayBuffer);
-    fs.writeFileSync(outputPath, buffer);
-    console.log(`PDF saved at: ${outputPath}`);
-    return outputPath;
-}
 
 
 
 
 // Fetch All Data from sheet 1
 async function sendMails(email, subject, text, secondEmail, attachments) {
-    try {
-
-        // Create reusable transporter object using the default SMTP transport
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            host: "smtp.gmail.com",
-            port: 587,
-            secure: false, // true for port 465, false for other ports
-            auth: {
-                user: process.env.USER,       // Sender gmail address 
-                pass: process.env.APP_PASSWORD,     // App password from gmail account this process are written on the bottom of the web page.
-            },
-        });
-
-
-        // mail with defined transport object
-        const info = await transporter.sendMail({
-            from: {
-                name: "Navyug Gym",
-                address: process.env.USER,
-            }, // sender address
-            // to: "bar@example.com, baz@example.com", // When we have list of receivers and here add gym mail account and our gym account.
-            // to: "dakshsgholedt2000@gmail.com",
-            to: `${email},${secondEmail}`,
-            subject: subject, // Subject line
-            text: text,
-            attachments: attachments
-        });
-
-        console.log("Message sent: %s", info.messageId);
-
-
-    } catch (error) {
-        console.log("Read data error", error.message);
-        // return res.status(400).json({ Error: error.message });
-    }
-}
-
-
-// Fetch All Data from sheet 1
-async function sendAdminMails(email, subject, text, attachments) {
     try {
 
         // Create reusable transporter object using the default SMTP transport
@@ -464,6 +374,8 @@ async function sendAdminMails(email, subject, text, attachments) {
         // return res.status(400).json({ Error: error.message });
     }
 }
+
+
 
 
 
@@ -954,7 +866,7 @@ The Navyug Gym Team
                 `
             }
 
-            await sendMails(email, subject, text, "navyuggym2025@gmail.com")
+            await sendMails(email, subject, text)
 
         }
 
@@ -1159,7 +1071,7 @@ Navyug Gym Team
 
 
         if (response.status === 200) {
-            await sendMails(fullInfo[1], subject, text, "navyuggym2025@gmail.com", attachments);
+            await sendMails(fullInfo[1], subject, text, attachments);
         }
 
         success = true;
@@ -1315,50 +1227,6 @@ async function fetchHomeData(req, res) {
             }
         }
 
-
-        let subject = "Welcome to Navyug Gym! Your Membership Data! 🎉"
-        let text = `
-Dear Daksh,
-
-Best regards,
-Navyug Gym Team
-        `
-
-
-        // Update data for sending email to Main Admin
-        const sheets = await accessGoogleSheet();
-        let response;
-
-        let previousDate = adminData[0][4];
-        const [endDay, endMonth, endYear] = previousDate.split("-").map(Number);
-        previousDate = new Date(endYear, endMonth - 1, endDay);
-
-        currentDate = new Date(year, month - 1, day)
-
-        if (previousDate.getTime() !== currentDate.getTime()) {
-
-            response = await sheets.spreadsheets.values.update({
-                spreadsheetId,
-                range: `AdminData!E2`,
-                valueInputOption: "USER_ENTERED",
-                resource: { values: [[formattedDate]] }
-            })
-
-            // console.log(response);
-            const pdfPath = await createAdminPDF(formattedDate);
-
-            let attachments = [
-                {
-                    filename: "gym-admin-data.pdf",
-                    path: pdfPath,
-                    contentType: "application/pdf"
-                },
-            ]
-
-            if (response.status === 200) {
-                await sendAdminMails("dakshghole@gmail.com", subject, text, attachments);
-            }
-        }
 
 
         for (let j = 0; j < data.length; j++) {
