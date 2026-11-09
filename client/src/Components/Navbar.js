@@ -75,10 +75,15 @@ const Navbar = () => {
                         <button>Subscription End</button>
                     </Link>
                     {showButtons ? <button onClick={handleLogout}>Logout</button> :
-                        <Link to="/admin" className={`${location.pathname === "/admin" ? "hideBtn" : ""}`}>
-                            {/* // <Link to="/admin" className={`${location.pathname === "/admin" ? "hideBtn" : "hideBtn"}`}> */}
-                            <button>Admin</button>
-                        </Link>}
+                        <>
+                            <Link to="/track/workout" className={`${location.pathname === "/track/workout" ? "hideBtn" : ""}`}>
+                                <button>Track Workout</button>
+                            </Link>
+                            <Link to="/admin" className={`${location.pathname === "/admin" ? "hideBtn" : ""}`}>
+                                {/* // <Link to="/admin" className={`${location.pathname === "/admin" ? "hideBtn" : "hideBtn"}`}> */}
+                                <button>Admin</button>
+                            </Link>
+                        </>}
                 </div>
             </div>
             <div className="mobileMenuIcon">

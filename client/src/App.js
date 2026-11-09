@@ -1,6 +1,7 @@
 import './App.css';
 import Waiting from './Pages/Waiting';
 import Home from './Pages/Home';
+import TrackWorkout from './Pages/TrackWorkout';
 // import Maintenance from './Pages/Maintenance';
 import {
   BrowserRouter as Router,
@@ -36,6 +37,7 @@ function App() {
             {/* <Route path='/' element={<Maintenance />} /> */}
             <Route path='/' element={<Home />} />
             <Route path='/user/home' element={<Waiting />} />
+            <Route path='/track/workout' element={<TrackWorkout />} />
             <Route path='/admin' element={<AdminLogin />} />
             <Route path='/admin/home' element={<AdminHome />} />
             <Route path='/admin/add/panel' element={<AdminPannel />} />
