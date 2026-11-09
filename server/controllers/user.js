@@ -4,14 +4,10 @@ const stream = require('stream');
 const jwt = require("jsonwebtoken")
 const JWT_SECURE = process.env.JWT_SECURE;
 const { google } = require("googleapis");
-const fs = require("fs")
-const os = require("os")
-const path = require("path")
 const nodemailer = require("nodemailer")
 const { jsPDF } = require("jspdf");     // Import the jsPDF library
 require("jspdf-autotable"); // Import jsPDF autoTable plugin
 const TOKEN_EXPIRATION = "45m";     // Token will expire in 1 hour (use other formats like '2d', '10m', '365d' as needed
-let success = false;
 const bcrypt = require("bcryptjs")
 
 
@@ -19,6 +15,7 @@ const bcrypt = require("bcryptjs")
 const private_key = process.env.PRIVATE_KEY
 const client_email = process.env.CLIENT_EMAIL
 const spreadsheetId = process.env.SPREADSHEETID
+const PHOTO_FOLDER_ID = process.env.DRIVE_PHOTO_FOLDER_ID
 
 
 // Get Auth Here
@@ -61,119 +58,12 @@ async function accessGoogleSheet() {
 }
 
 
-// Access Google Drive Using Local Storage
-async function accessGoogleDrive(image, email) {
-
-    const auth = await getAuth();
-
-    // Obtain an authenticated client
-    const drive = google.drive({ version: "v3", auth })
-
-
-    // // File details
-    const imageFilePath = `./files/${image.filename}`;
-    const imageFileName = `${email}.jpg`;
-    const mimeType = `${image.mimetype}`;   // Adjust the mime type according to your file
-
-
-    // File metadata
-    const fileMetadata = {
-        name: imageFileName
-    }
-
-
-    // File content
-    const media = {
-        mimeType,
-        body: fs.createReadStream(imageFilePath)
-    }
-
-    const uploaderEmail = "dakshghole@gmail.com";
-
-    let imageLinkShree;
-
-    let uploadImage = await drive.files.create(
-        {
-            resource: fileMetadata,
-            media,
-            fields: "id"
-        });
-
-    try {
-        console.log("File uploaded! File ID: ", uploadImage.data.id);
-
-
-        // Set permissions to make the file publicly accessible
-        let setPermission = await drive.permissions.create(
-            {
-                fileId: uploadImage.data.id,
-                requestBody: {
-                    role: "reader",           // or "writer" if the user should have edit permissions
-                    // type: "anyone",
-                    type: "user",             // Grant access to a specific user
-                    emailAddress: uploaderEmail,       // Uploader's email address
-                },
-            });
-
-        if (setPermission.statusText === "OK") {
-
-            // Retrieve the file's web view link
-            const imageLink = await drive.files.get(
-                {
-                    fileId: uploadImage.data.id,
-                    fields: "webViewLink",
-                });
-
-            if (imageLink.statusText === "OK") {
-
-                console.log("File link:", imageLink.data.webViewLink);
-
-                imageLinkShree = imageLink.data.webViewLink;
-            }
-            else {
-                console.error("Error retrieving link:", err);
-            }
-        }
-        else {
-            console.error("Error setting permissions:", error);
-        }
-
-        // Destination folder ID where you want to copy the image
-        const destinationFolderId = "1CeahbvW4dl-X85RYl9BH3ocLAvg3C-DR"
-
-        // Replace with the actual folder ID
-
-        // Create the metadata for the copy
-        const copyMetadata = {
-            parents: [destinationFolderId]
-        }
-
-        let copyImage = await drive.files.copy({
-            fileId: uploadImage.data.id,
-            resource: copyMetadata
-        });
-
-        if (copyImage.statusText === "OK") {
-            console.log("File copied! New File ID:", copyImage.data.id);
-
-            let copyImageId = copyImage.data.id;
-            return { imageLinkShree, copyImageId };
-        }
-        else {
-            console.error("Error copying file: ", error);
-        }
-
-
-    } catch (error) {
-        console.error("Error uploading file:", error);
-    }
-
-}
-
-
-
 // Access Google Drive Using Buffer Storage
 async function uploadToGoogleDrive(fileBuffer, mimeType, fileName) {
+    if (!PHOTO_FOLDER_ID) {
+        throw new Error("DRIVE_PHOTO_FOLDER_ID is not set");
+    }
+
     const auth = await getAuth();
 
     // Obtain an authenticated client
@@ -185,7 +75,7 @@ async function uploadToGoogleDrive(fileBuffer, mimeType, fileName) {
     const response = await drive.files.create({
         resource: {
             name: fileName,
-            parents: ['1HpJ-NI-rzT_HfDStxYcFeh-fTsePfTO5']  // Optional: specify a destination folder
+            parents: [PHOTO_FOLDER_ID]
         },
         media: {
             mimeType: mimeType,
@@ -198,6 +88,14 @@ async function uploadToGoogleDrive(fileBuffer, mimeType, fileName) {
 }
 
 
+
+// Business dates are IST. Vercel runs in UTC, so read the date parts in Asia/Kolkata explicitly
+// instead of using the local getters on new Date().
+function getIstDateParts(date = new Date()) {
+    const parts = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Kolkata", year: "numeric", month: "numeric", day: "numeric" }).formatToParts(date);
+    const partValue = (type) => Number(parts.find((part) => part.type === type).value);
+    return { year: partValue("year"), month: partValue("month"), day: partValue("day") };
+}
 
 // Method
 async function createPdf(fullName, fullInfo, amount, userName) {
@@ -270,7 +168,6 @@ async function createPdf(fullName, fullInfo, amount, userName) {
     // const headers = ['Name', 'Email', 'Amount'];
     // const rows = [
     //     [clientData.name, clientData.email, `$${clientData.amount}`]
-    //     // ["Dakshet Ghole", "dakshghole@gmail.com", "2000"]
     // ];
 
     // Add table headers
@@ -278,7 +175,6 @@ async function createPdf(fullName, fullInfo, amount, userName) {
     const rows = [
         ["       1", "           Gym", `    ${fullInfo[5]}    To    ${fullInfo[6]}`, "              Cash", `    ${amount}`],
         ["", "", "", "              Total", `    ${amount}`]
-        // ["Dakshet Ghole", "dakshghole@gmail.com", "2000"]
     ];
 
 
@@ -305,26 +201,8 @@ async function createPdf(fullName, fullInfo, amount, userName) {
     doc.text(`Received by:  Navyug Gym`, 20, 118);
     doc.text(`Received Signature:  ${userName}`, 20, 128);
 
-    // Save or output the PDF
-    // doc.save("gym-registration-receipt.pdf");
-    const tempDir = os.tmpdir(); // Get temporary directory
-    // Define the file path
-    const outputPath = path.join(tempDir, "gym-registration-receipt.pdf");
-
-    // Save or output the PDF
-    const arrayBuffer = doc.output("arraybuffer");
-
-    // Convert ArrayBuffer to Buffer
-    const buffer = Buffer.from(arrayBuffer);
-
-
-
-    // Save the PDF
-    fs.writeFileSync(outputPath, buffer);
-
-    console.log(`PDF saved at: ${outputPath}`);
-    return outputPath; // Return the file path
-
+    // Returned as a buffer (not a shared temp file) so concurrent approvals can't overwrite each other's receipt.
+    return Buffer.from(doc.output("arraybuffer"));
 }
 
 
@@ -336,7 +214,7 @@ async function createPdf(fullName, fullInfo, amount, userName) {
 
 
 // Fetch All Data from sheet 1
-async function sendMails(email, subject, text, secondEmail, attachments) {
+async function sendMails(email, subject, text, attachments) {
     try {
 
         // Create reusable transporter object using the default SMTP transport
@@ -359,7 +237,6 @@ async function sendMails(email, subject, text, secondEmail, attachments) {
                 address: process.env.USER,
             }, // sender address
             // to: "bar@example.com, baz@example.com", // When we have list of receivers and here add gym mail account and our gym account.
-            // to: "dakshsgholedt2000@gmail.com",
             to: `${email}`,
             subject: subject, // Subject line
             text: text,
@@ -368,10 +245,10 @@ async function sendMails(email, subject, text, secondEmail, attachments) {
 
         console.log("Message sent: %s", info.messageId);
 
-
     } catch (error) {
-        console.log("Read data error", error.message);
-        // return res.status(400).json({ Error: error.message });
+        console.error("Send mail error:", error.message);
+        // Callers decide how to surface the failure; swallowing it here made failed mails look sent.
+        throw error;
     }
 }
 
@@ -469,56 +346,13 @@ async function createUser(req, res) {
         const copyImageId = driveResponse.id;
 
 
-        // // Add Date
-        // const currentDate = new Date();
-
-        // // Get individual components:
-        // const year = currentDate.getFullYear();
-        // const month = currentDate.getMonth() + 1; // Months are 0-indexed
-        // const day = currentDate.getDate();
-
-        // // Format the date:
-        // const formattedDate
-        //     = `${day.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${year}`;
-
-
-        // // After 1 year
-        // const currentbDate = new Date();
-        // currentbDate.setFullYear(currentbDate.getFullYear() + 1);
-        // const afterYear = currentbDate.getFullYear();
-        // const afterMonth = currentbDate.getMonth() + 1; // Months are 0-indexed
-        // const afterDay = currentbDate.getDate();
-        // const afterOneYearDate = `${afterDay.toString().padStart(2, '0')}-${afterMonth.toString().padStart(2, '0')}-${afterYear}`;
-
-
-        // Function to get current date in IST
-        function getIndianDate(offsetInMinutes = 330) {
-            const currentDate = new Date();
-            const indianDate = new Date(currentDate.getTime() + offsetInMinutes * 60 * 1000); // Offset in minutes
-            return indianDate;
-        }
-
-        // Get current date in IST
-        const currentDate = getIndianDate();
-
-        // Format current date in DD-MM-YYYY format
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1; // Months are 0-indexed
-        const day = currentDate.getDate();
-
+        // Current date in IST, formatted DD-MM-YYYY
+        const { year, month, day } = getIstDateParts();
         const formattedDate = `${day.toString().padStart(2, '0')}-${month.toString().padStart(2, '0')}-${year}`;
-        // console.log("Current Date (IST):", formattedDate);
 
-        // After 1 year in IST
-        const afterOneYearDateObject = getIndianDate();
-        afterOneYearDateObject.setFullYear(afterOneYearDateObject.getFullYear() + 1);
-
-        const afterYear = afterOneYearDateObject.getFullYear();
-        const afterMonth = afterOneYearDateObject.getMonth() + 1;
-        const afterDay = afterOneYearDateObject.getDate();
-
-        const afterOneYearDate = `${afterDay.toString().padStart(2, '0')}-${afterMonth.toString().padStart(2, '0')}-${afterYear}`;
-        // console.log("Date After 1 Year (IST):", afterOneYearDate);
+        // One year later; Date.UTC rolls 29-Feb forward the same way setFullYear did
+        const oneYearLater = new Date(Date.UTC(year + 1, month - 1, day));
+        const afterOneYearDate = `${oneYearLater.getUTCDate().toString().padStart(2, '0')}-${(oneYearLater.getUTCMonth() + 1).toString().padStart(2, '0')}-${oneYearLater.getUTCFullYear()}`;
 
 
 
@@ -567,14 +401,12 @@ async function createUser(req, res) {
             }
         }
 
-        success = true;
-        return res.status(200).json({ success, Result: response })
+        return res.status(200).json({ success: true, Result: response })
 
 
     } catch (error) {
         console.log(error.message);
-        success = false;
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 
@@ -612,8 +444,7 @@ async function loginAdmin(req, res) {
         }
         else {
             isMobileNoVerify = false;
-            success = false;
-            return res.status(400).json({ success, Error: "User not found!" })
+            return res.status(400).json({ success: false, Error: "User not found!" })
         }
 
 
@@ -630,19 +461,16 @@ async function loginAdmin(req, res) {
             const token = jwt.sign(payload, JWT_SECURE, { expiresIn: TOKEN_EXPIRATION });
 
             //Final
-            success = true;
-            return res.status(201).json({ success, token })
+            return res.status(201).json({ success: true, token })
         }
         else {
             isPasswordVerify = false;
-            success = false;
-            return res.status(400).json({ success, Error: "Passwords doesn't match!" })
+            return res.status(400).json({ success: false, Error: "Passwords doesn't match!" })
         }
 
 
     } catch (error) {
         console.log(error.message);
-        success = false;
         return res.status(500).json({ Error: "Internal Serval Error Occured!" })
     }
 }
@@ -672,15 +500,13 @@ async function fetchFeesPendingData(req, res) {
         });
 
 
-        success = true;
-        return res.status(200).json({ success, Data: dataArray })
+        return res.status(200).json({ success: true, Data: dataArray })
 
 
 
     } catch (error) {
         console.log(error.message);
-        success = false;
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 
@@ -708,146 +534,93 @@ async function searchUser(req, res) {
         }
 
         if (dataArray.length !== 0) {
-            success = true;
-            return res.status(200).json({ success, Data: dataArray })
+            return res.status(200).json({ success: true, Data: dataArray })
         }
         else {
-            success = true;
-            return res.status(200).json({ success, Data: "User is not found!" })
+            return res.status(200).json({ success: true, Data: "User is not found!" })
 
         }
 
     } catch (error) {
         console.log(error.message);
-        success = false;
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 
 
-// Fetch data those are between before 5 days and end date 
-async function feesDeadlineData(req, res) {
-    try {
+const REMINDER_DAYS_BEFORE_EXPIRY = 5;
+const PURGE_GRACE_DAYS = 15;
+const COL_FLAG_FIVE_DAY = "O";
+const COL_FLAG_EXPIRY_DAY = "P";
 
-        // Add Date
-        const currentDate = new Date();
+// "DD-MM-YYYY" (sheet format) -> Date at local midnight, comparable with todayIst().
+function parseSheetDate(value) {
+    const [day, month, year] = value.split("-").map(Number);
+    return new Date(year, month - 1, day);
+}
 
-        // Get individual components:
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1; // Months are 0-indexed
-        const day = currentDate.getDate();
+function todayIst() {
+    const { year, month, day } = getIstDateParts();
+    return new Date(year, month - 1, day);
+}
 
+function addDays(date, days) {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+}
 
-        // Fetch Data
-        let data = await fetchData();
-        let deadlineUserData = [];
-        let firstName;
-        const sheets = await accessGoogleSheet();
-        let response;
+// Newest start date first
+function sortByStartDateDesc(rows) {
+    return rows.sort((a, b) => {
+        const dateA = new Date(a[5].split('-').reverse().join('-'));
+        const dateB = new Date(b[5].split('-').reverse().join('-'));
+        return dateB - dateA;
+    });
+}
 
+function capitalizeFirstName(fullName) {
+    const first = fullName.split(" ")[0];
+    return first.charAt(0).toUpperCase() + first.slice(1);
+}
 
-        for (let item = 0; item < data.length; item++) {
-
-            if (data[item].length !== 0) {
-
-                let endDeadlineDate = data[item][6];
-                const [endDay, endMonth, endYear] = endDeadlineDate.split("-").map(Number);
-
-                endDeadlineDate = new Date(endYear, endMonth - 1, endDay)
-
-                let previousDeadlineDate = new Date(endDeadlineDate);
-                previousDeadlineDate.setDate(endDeadlineDate.getDate() - 5);
-
-
-                let currentDate = new Date(year, month - 1, day)
-
-
-                if (
-                    previousDeadlineDate.getTime() <= currentDate.getTime() &&
-                    currentDate.getTime() <= endDeadlineDate.getTime()
-                ) {
-                    deadlineUserData.push(data[item]);
-                }
-
-                if (previousDeadlineDate.getTime() === currentDate.getTime()) {
-
-                    // Add Our Logic Here To store in the database i.e. YES
-                    if (data[item][14] === "No") {
-                        response = await sheets.spreadsheets.values.update({
-                            spreadsheetId,
-                            range: `UserData!O${item + 2}`,
-                            valueInputOption: "USER_ENTERED",
-                            resource: { values: [["Yes"]] }
-                        })
-
-                        firstName = data[item][0].split(" ")[0].charAt(0).toUpperCase() + data[item][0].split(" ")[0].slice(1);
-
-                        await sendMailData("beforeFiveDays", data[item][1], firstName, data[item][6])
-
-                    }
-                }
-
-                else if (currentDate.getTime() === endDeadlineDate.getTime()) {
-
-                    // Add Our Logic Here To store in the database i.e. YES
-                    if (data[item][15] === "No") {
-                        response = await sheets.spreadsheets.values.update({
-                            spreadsheetId,
-                            range: `UserData!P${item + 2}`,
-                            valueInputOption: "USER_ENTERED",
-                            resource: { values: [["Yes"]] }
-                        })
-
-                        firstName = data[item][0].split(" ")[0].charAt(0).toUpperCase() + data[item][0].split(" ")[0].slice(1);
-
-                        await sendMailData("endSubscription", data[item][1], firstName, data[item][6])
-
-                    }
-
-                }
-            }
-        }
-
-
-        async function sendMailData(mailType, email, firstName, date) {
-
-            let subject;
-            let text;
-
-            if (mailType === "beforeFiveDays") {
-                subject = `Reminder: Your Subscription Will Expire in 5 Days`;
-                text = `
+function buildReminderMail(mailType, firstName, date) {
+    if (mailType === "beforeFiveDays") {
+        return {
+            subject: `Reminder: Your Subscription Will Expire in 5 Days`,
+            text: `
 Dear ${firstName},
-    
+
 We hope this message finds you well! This is a friendly reminder that your subscription with Navyug Gym will expire in 5 days, on ${date}.
-    
+
 We encourage you to renew your membership to continue enjoying our facilities, and the support of our dedicated team to help you reach your fitness goals.
-    
+
 How to Renew Your Membership:
     - Visit Us at the Front Desk - Our team will be happy to assist you with the renewal process.
     - Contact Us: If you have any questions, please reach out to us via email at navyuggym@gmail.com or contact our team directly:
                         - Mahesh Wagh: +91 8291616435
                         - Suresh Tambe: +91 9870216612
                         - Santosh Mahaprolkar: +91 9969087553
-                
+
 We appreciate your commitment to fitness and look forward to supporting you on your journey at Navyug Gym. Don’t hesitate to reach out if you have any questions or need assistance.
-    
+
 Thank you for being a valued member of our gym family!
-    
+
 Warm regards,
 The Navyug Gym Team
             `
-            }
+        };
+    }
 
-            else if (mailType === "endSubscription") {
-                subject = `Important: Your Navyug Gym Subscription Ends Today`;
-                text = `
+    return {
+        subject: `Important: Your Navyug Gym Subscription Ends Today`,
+        text: `
 Dear ${firstName},
-        
+
 We hope you're doing well! We wanted to remind you that your subscription with Navyug Gym is set to expire today, ${date}.
-        
+
 To continue enjoying uninterrupted access to our facilities, and support, we encourage you to renew your membership as soon as possible.
-        
+
 How to Renew Your Membership:
     - Visit Us at the Front Desk - Our team will be happy to assist you with the renewal process.
     - Contact Us: If you have any questions, please reach out to us via email at navyuggym@gmail.com or contact our team directly:
@@ -855,118 +628,158 @@ How to Renew Your Membership:
                         - Suresh Tambe: +91 9870216612
                         - Santosh Mahaprolkar: +91 9969087553'
 
-To renew your subscription online, please visit our website at [www.navyuggym.in] and fill out the form provided.                      
-                    
+To renew your subscription online, please visit our website at [www.navyuggym.in] and fill out the form provided.
+
 We appreciate your commitment to fitness and look forward to supporting you on your journey at Navyug Gym. Don’t hesitate to reach out if you have any questions or need assistance.
-        
+
 Thank you for being a valued member of our gym family!
-        
+
 Warm regards,
 The Navyug Gym Team
                 `
-            }
-
-            await sendMails(email, subject, text)
-
-        }
+    };
+}
 
 
-        // Sort in Decending order (youngest first)
-        deadlineUserData.sort((a, b) => {
-            const dateA = new Date(a[5].split('-').reverse().join('-'));
-            const dateB = new Date(b[5].split('-').reverse().join('-'));
-            return dateB - dateA;
+// Members inside the reminder window (5 days before expiry .. expiry day). Read-only.
+async function feesDeadlineData(req, res) {
+    try {
+        const data = await fetchData();
+        const currentDate = todayIst();
+
+        const deadlineUserData = data.filter((row) => {
+            if (row.length === 0) return false;
+            const endDate = parseSheetDate(row[6]);
+            const windowStart = addDays(endDate, -REMINDER_DAYS_BEFORE_EXPIRY);
+            return windowStart.getTime() <= currentDate.getTime() && currentDate.getTime() <= endDate.getTime();
         });
 
-        success = true;
-        return res.status(200).json({ success, Data: deadlineUserData })
-
+        return res.status(200).json({ success: true, Data: sortByStartDateDesc(deadlineUserData) })
 
     } catch (error) {
-        console.log(error.message);
-        success = false;
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        console.error(error.message);
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 
 
-
-// Fetch data those are between before 5 days and end date and also delete when data date is exceed the current date.
+// Expired members still inside the 15-day grace period. Read-only; removal is done by purgeExpiredMembers.
 async function feesSubscriptionEndData(req, res) {
     try {
+        const data = await fetchData();
+        const currentDate = todayIst();
 
-        // Add Date
-        const currentDate = new Date();
-
-        // Get individual components:
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1; // Months are 0-indexed
-        const day = currentDate.getDate();
-
-
-        // Fetch Data
-        let data = await fetchData();
-        let deadlineUserData = [];
-        const sheets = await accessGoogleSheet();
-        const auth = await getAuth();
-
-        // Obtain an authenticated client
-        const drive = google.drive({ version: "v3", auth })
-
-
-        for (let item = 0; item < data.length; item++) {
-
-            if (data[item].length !== 0) {
-
-                let previousEndDeadlineDate = data[item][6];
-                const [endDay, endMonth, endYear] = previousEndDeadlineDate.split("-").map(Number);
-
-                previousEndDeadlineDate = new Date(endYear, endMonth - 1, endDay)
-
-                let endSubDeadlineDate = new Date(previousEndDeadlineDate);
-                endSubDeadlineDate.setDate(endSubDeadlineDate.getDate() + 15);
-
-
-                let currentDate = new Date(year, month - 1, day)
-
-                if (previousEndDeadlineDate.getTime() < currentDate.getTime() && currentDate.getTime() <= endSubDeadlineDate.getTime()) {
-                    deadlineUserData.push(data[item]);
-                }
-                else if (endSubDeadlineDate.getTime() < currentDate.getTime()) {
-
-                    try {
-                        responseDrive = drive.files.delete(
-                            {
-                                fileId: data[item][4],
-                            })
-                        response = await sheets.spreadsheets.values.clear({
-                            spreadsheetId,
-                            range: `UserData!A${item + 2}:Q${item + 2}`,
-                        })
-
-                    } catch (error) {
-                        console.log("Error during Deleting: ", error)
-                    }
-                }
-            }
-
-        }
-
-        // Sort in Decending order (youngest first)
-        deadlineUserData.sort((a, b) => {
-            const dateA = new Date(a[5].split('-').reverse().join('-'));
-            const dateB = new Date(b[5].split('-').reverse().join('-'));
-            return dateB - dateA;
+        const expiredUserData = data.filter((row) => {
+            if (row.length === 0) return false;
+            const endDate = parseSheetDate(row[6]);
+            const graceEnd = addDays(endDate, PURGE_GRACE_DAYS);
+            return endDate.getTime() < currentDate.getTime() && currentDate.getTime() <= graceEnd.getTime();
         });
 
-        success = true;
-        return res.status(200).json({ success, Data: deadlineUserData })
-
+        return res.status(200).json({ success: true, Data: sortByStartDateDesc(expiredUserData) })
 
     } catch (error) {
-        console.log(error.message);
-        success = false;
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        console.error(error.message);
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
+    }
+}
+
+
+// Sends the 5-day and expiry-day reminders. The flag is written only after the mail is accepted,
+// so a failed mail is retried on the next run and a sent mail is never repeated.
+async function sendExpiryReminders() {
+    const data = await fetchData();
+    const sheets = await accessGoogleSheet();
+    const currentDate = todayIst();
+    const result = { sent: 0, failed: 0 };
+
+    for (let item = 0; item < data.length; item++) {
+        const row = data[item];
+        if (row.length === 0) continue;
+
+        const endDate = parseSheetDate(row[6]);
+        const fiveDayDate = addDays(endDate, -REMINDER_DAYS_BEFORE_EXPIRY);
+
+        let mailType;
+        let flagColumn;
+        if (fiveDayDate.getTime() === currentDate.getTime() && row[14] === "No") {
+            mailType = "beforeFiveDays";
+            flagColumn = COL_FLAG_FIVE_DAY;
+        }
+        else if (endDate.getTime() === currentDate.getTime() && row[15] === "No") {
+            mailType = "endSubscription";
+            flagColumn = COL_FLAG_EXPIRY_DAY;
+        }
+        else {
+            continue;
+        }
+
+        try {
+            const { subject, text } = buildReminderMail(mailType, capitalizeFirstName(row[0]), row[6]);
+            await sendMails(row[1], subject, text);
+            await sheets.spreadsheets.values.update({
+                spreadsheetId,
+                range: `UserData!${flagColumn}${item + 2}`,
+                valueInputOption: "USER_ENTERED",
+                resource: { values: [["Yes"]] }
+            });
+            result.sent++;
+        } catch (error) {
+            result.failed++;
+            console.error(`Reminder (${mailType}) failed for sheet row ${item + 2}:`, error.message);
+        }
+    }
+
+    return result;
+}
+
+
+// Clears rows (and deletes photos) for members expired more than 15 days ago.
+async function purgeExpiredMembers() {
+    const data = await fetchData();
+    const sheets = await accessGoogleSheet();
+    const auth = await getAuth();
+    const drive = google.drive({ version: "v3", auth })
+    const currentDate = todayIst();
+    const result = { removed: 0, failed: 0 };
+
+    for (let item = 0; item < data.length; item++) {
+        const row = data[item];
+        if (row.length === 0) continue;
+
+        const graceEnd = addDays(parseSheetDate(row[6]), PURGE_GRACE_DAYS);
+        if (graceEnd.getTime() >= currentDate.getTime()) continue;
+
+        try {
+            await drive.files.delete({ fileId: row[4] });
+            await sheets.spreadsheets.values.clear({
+                spreadsheetId,
+                range: `UserData!A${item + 2}:Q${item + 2}`,
+            })
+            result.removed++;
+        } catch (error) {
+            result.failed++;
+            console.error(`Purge failed for sheet row ${item + 2}:`, error.message);
+        }
+    }
+
+    return result;
+}
+
+
+// Scheduled entry point (Vercel cron, see vercel.json). Replaces the mail/delete side effects
+// that used to run whenever an admin opened the expiry pages.
+async function runDailyMaintenance(req, res) {
+    try {
+        const reminders = await sendExpiryReminders();
+        const purge = await purgeExpiredMembers();
+        const hasFailures = reminders.failed > 0 || purge.failed > 0;
+
+        return res.status(hasFailures ? 500 : 200).json({ success: !hasFailures, Data: { reminders, purge } })
+
+    } catch (error) {
+        console.error(error.message);
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 
@@ -1014,19 +827,23 @@ async function acceptFeesPayment(req, res) {
             }
         }
 
+        if (!fullInfo) {
+            return res.status(404).json({ success: false, Error: "Member not found!" })
+        }
+
         // Here get Full Name
         let fullName = fullInfo[0].split(" ").map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(" ");
 
 
         // Full Name and meta data send to the pdf method.
 
-        const pdfPath = await createPdf(fullName, fullInfo, amount, userName);
+        const pdfBuffer = await createPdf(fullName, fullInfo, amount, userName);
 
         // Create attachments
         let attachments = [
             {
                 filename: "gym-registration-receipt.pdf",
-                path: pdfPath,
+                content: pdfBuffer,
                 contentType: "application/pdf"
             },
         ]
@@ -1061,27 +878,21 @@ Best regards,
 Navyug Gym Team
         `
 
-        // let attachments = [
-        //     {
-        //         filename: "Receipt.pdf",
-        //         path: path.join(__dirname, "../files/Receipt.pdf"),
-        //         contentType: "application/pdf"
-        //     },
-        // ]
-
-
         if (response.status === 200) {
-            await sendMails(fullInfo[1], subject, text, attachments);
+            try {
+                await sendMails(fullInfo[1], subject, text, attachments);
+            } catch (mailError) {
+                // The approval is already saved in the sheet; tell the admin the receipt did not go out.
+                return res.status(200).json({ success: true, Data: "Member approved, but the receipt email could not be sent. Please send the receipt manually." })
+            }
         }
 
-        success = true;
-        return res.status(200).json({ success, Data: "Successfully Add Member" })
+        return res.status(200).json({ success: true, Data: "Successfully Add Member" })
 
 
     } catch (error) {
         console.log(error.message);
-        success = false;
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 
@@ -1100,17 +911,13 @@ async function deletePendingUserData(req, res) {
         // Obtain an authenticated client
         const drive = google.drive({ version: "v3", auth })
         let response;
-        let responseDrive;
 
         for (let j = 0; j < data.length; j++) {
 
             if (data[j][4] === fileId) {
 
                 try {
-                    responseDrive = drive.files.delete(
-                        {
-                            fileId: fileId,
-                        })
+                    await drive.files.delete({ fileId: fileId });
                     response = await sheets.spreadsheets.values.clear({
                         spreadsheetId,
                         range: `UserData!A${j + 2}:Q${j + 2}`,
@@ -1123,14 +930,12 @@ async function deletePendingUserData(req, res) {
             }
         }
 
-        success = true;
-        return res.status(200).json({ success, Data: response, DriveData: responseDrive })
+        return res.status(200).json({ success: true, Data: response })
 
 
     } catch (error) {
         console.log(error.message);
-        success = false;
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 
@@ -1140,7 +945,12 @@ async function fetchImage(req, res) {
     try {
         // let imageUrl = "https://res.cloudinary.com/dpkaxrntd/image/upload/v1729657532/iqgpcl1hnra06rdi1e93.jpg"
 
-        let fileId = req.params.id;
+        const fileId = req.params.id;
+
+        // Drive file IDs are URL-safe tokens; anything else would change the upstream URL
+        if (!/^[A-Za-z0-9_-]+$/.test(fileId)) {
+            return res.status(400).json({ success: false, Error: "Invalid member ID!" })
+        }
 
         let imageUrl = `https://lh3.googleusercontent.com/d/${fileId}`
 
@@ -1173,8 +983,7 @@ async function fetchImage(req, res) {
 
     } catch (error) {
         console.log(error.message);
-        success = false;
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 
@@ -1205,12 +1014,7 @@ async function fetchHomeData(req, res) {
 
         let actuallyMember = [];
 
-        let currentDate = new Date();
-
-        // Get individual components:
-        const year = currentDate.getFullYear();
-        const month = currentDate.getMonth() + 1; // Months are 0-indexed
-        const day = currentDate.getDate();
+        const { year, month, day } = getIstDateParts();
 
         // Format the date:
         const formattedDate
@@ -1291,14 +1095,12 @@ async function fetchHomeData(req, res) {
         // Total Members
         totalMembers = actuallyMember.length;
 
-        success = true;
-        return res.status(200).json({ success, Data: { adminFirstName, totalMembers, insiderMembers, outsiderMembers, morningMembers, eveningMembers, membersBelowFifteen, fifteenToTwenty, twentyToThirty, membersAboveThirty } })
+        return res.status(200).json({ success: true, Data: { adminFirstName, totalMembers, insiderMembers, outsiderMembers, morningMembers, eveningMembers, membersBelowFifteen, fifteenToTwenty, twentyToThirty, membersAboveThirty } })
 
 
     } catch (error) {
         console.log(error.message);
-        success = false;
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 
@@ -1345,14 +1147,12 @@ async function fetchDataMonthWise(req, res) {
             return dateB - dateA;
         });
 
-        success = true;
-        return res.status(200).json({ success, Data: monthWiseData })
+        return res.status(200).json({ success: true, Data: monthWiseData })
 
 
     } catch (error) {
         console.log(error.message);
-        success = false;
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 
@@ -1368,14 +1168,12 @@ async function fetchDaysForSubscriptionEnd(req, res) {
         let previousDate = adminData[0][5];
 
 
-        success = true;
-        return res.status(200).json({ success, Data: previousDate })
+        return res.status(200).json({ success: true, Data: previousDate })
 
 
     } catch (error) {
         console.log(error.message);
-        success = false;
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 
@@ -1391,6 +1189,11 @@ function getAlphabetFromNumber(num) {
 
 
 
+// Monthly visit counters live on this AdminData row (cols A–L, one per month).
+const VISIT_COUNTER_SHEET_ROW = 7;
+// fetchAdminData drops the header row, so sheet row N is at index N - 2.
+const VISIT_COUNTER_ADMIN_INDEX = VISIT_COUNTER_SHEET_ROW - 2;
+
 // Count web visit
 async function countWebVisit(req, res) {
     try {
@@ -1399,28 +1202,25 @@ async function countWebVisit(req, res) {
         // Update data for sending email to Main Admin
         const sheets = await accessGoogleSheet();
 
-        const currentDate = new Date();
-        const month = currentDate.getMonth();
+        const month = getIstDateParts().month - 1; // 0-indexed, matches adminData month columns
 
-        let countVisit = Number(adminData[5][month]) + 1;
+        let countVisit = Number(adminData[VISIT_COUNTER_ADMIN_INDEX][month]) + 1;
 
         let letter = await getAlphabetFromNumber(month + 1);
 
         // console.log(countVisit);
         let response = await sheets.spreadsheets.values.update({
             spreadsheetId,
-            range: `AdminData!${letter}${7}`,              //WHen we add the admin at that time we need to change in the data
+            range: `AdminData!${letter}${VISIT_COUNTER_SHEET_ROW}`,              //WHen we add the admin at that time we need to change in the data
             valueInputOption: "USER_ENTERED",
             resource: { values: [[countVisit]] }
         })
 
-        success = true;
-        return res.status(200).json({ success, Data: "Success" })
+        return res.status(200).json({ success: true, Data: "Success" })
 
     } catch (error) {
         console.log(error.message);
-        success = false;
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 
@@ -1439,6 +1239,7 @@ module.exports = {
     fetchImage,
     fetchHomeData,
     feesSubscriptionEndData,
+    runDailyMaintenance,
     fetchDataMonthWise,
     fetchDaysForSubscriptionEnd,
     countWebVisit

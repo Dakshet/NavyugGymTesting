@@ -1,4 +1,3 @@
-let success = false;
 const jwt = require("jsonwebtoken")
 const JWT_SECURE = process.env.JWT_SECURE;
 
@@ -7,8 +6,7 @@ const fetchUser = (req, res, next) => {
         const token = req.header("auth_token");
 
         if (!token) {
-            success = false;
-            return res.status(404).json({ success, Error: "Token is not found!" })
+            return res.status(404).json({ success: false, Error: "Token is not found!" })
         }
 
         try {
@@ -20,15 +18,13 @@ const fetchUser = (req, res, next) => {
             next();
 
         } catch (error) {
-            success = false;
             console.log(error.message);
-            return res.status(400).json({ success, Error: "Invalid or expired token!" })
+            return res.status(400).json({ success: false, Error: "Invalid or expired token!" })
         }
 
     } catch (error) {
-        success = false;
         console.log(error.message);
-        return res.status(500).json({ success, Error: "Internal Serval Error Occured!" })
+        return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
 

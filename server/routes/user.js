@@ -1,6 +1,7 @@
 const express = require("express");
-const { createUser, loginAdmin, fetchFeesPendingData, searchUser, feesDeadlineData, acceptFeesPayment, deletePendingUserData, fetchImage, fetchHomeData, feesSubscriptionEndData, fetchDataMonthWise, fetchDaysForSubscriptionEnd, countWebVisit } = require("../controllers/user");
+const { createUser, loginAdmin, fetchFeesPendingData, searchUser, feesDeadlineData, acceptFeesPayment, deletePendingUserData, fetchImage, fetchHomeData, feesSubscriptionEndData, runDailyMaintenance, fetchDataMonthWise, fetchDaysForSubscriptionEnd, countWebVisit } = require("../controllers/user");
 const { fetchUser } = require("../middleware/fetchUser");
+const { verifyCron } = require("../middleware/verifyCron");
 const multer = require('multer')
 
 const router = express.Router();
@@ -20,12 +21,14 @@ router.get("/admin/search/", fetchUser, searchUser);
 router.get("/admin/feesdeadline", fetchUser, feesDeadlineData);
 router.put("/admin/feesaccept/:id", fetchUser, acceptFeesPayment);
 router.delete("/admin/deletedata/:id", fetchUser, deletePendingUserData);
-router.get("/admin/fetchimage/:id", fetchImage)
+router.get("/admin/fetchimage/:id", fetchUser, fetchImage)
 router.get("/admin/homedata", fetchUser, fetchHomeData);
 router.get("/admin/feesend", fetchUser, feesSubscriptionEndData);
 router.get("/admin/fetchmonthwise/:month", fetchUser, fetchDataMonthWise)
 router.get("/admin/fetchdays", fetchUser, fetchDaysForSubscriptionEnd)
 router.get("/admin/visitdata", countWebVisit)
+// Vercel cron only issues GET requests; verifyCron checks the CRON_SECRET bearer token.
+router.get("/cron/daily", verifyCron, runDailyMaintenance);
 
 
 module.exports = router;

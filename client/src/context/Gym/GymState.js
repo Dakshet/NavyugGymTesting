@@ -388,7 +388,10 @@ const GymState = (props) => {
 
         try {
             const response = await fetch(`${host}/user/admin/fetchimage/${id}`, {
-                method: "GET"
+                method: "GET",
+                headers: {
+                    "auth_token": localStorage.getItem("gymdata")
+                }
             })
 
             if (response.ok) {
