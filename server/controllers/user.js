@@ -303,11 +303,30 @@ async function fetchAdminData() {
 }
 
 
+// Emails are the re-registration key, so compare and store them in one canonical form
+function normalizeEmail(value) {
+    return String(value ?? "").trim().toLowerCase();
+}
+
+// Best-effort Drive cleanup. The sheet has already been settled by the time this runs,
+// so a failure is logged rather than turned into an error for the caller.
+async function deleteDrivePhoto(fileId) {
+    try {
+        const auth = await getAuth();
+        const drive = google.drive({ version: "v3", auth });
+        await drive.files.delete({ fileId });
+    } catch (error) {
+        console.error("Drive photo delete failed:", error.message);
+    }
+}
+
 // Create New Gym Member
 async function createUser(req, res) {
+    let newFileId = null;
     try {
         //Destructure the request 
-        const { fName, email, mobileNo, address, dOB, age, bloodGroup, workoutTime } = req.body;
+        const { fName, mobileNo, address, dOB, age, bloodGroup, workoutTime } = req.body;
+        const email = normalizeEmail(req.body.email);
 
         let fullName = fName.toLowerCase();
 
@@ -316,34 +335,21 @@ async function createUser(req, res) {
 
         // Check if email already exists and find the row index
         let existingUserIndex = -1;
-        if (data.length > 0) {
-            for (let i = 0; i < data.length; i++) {
-                if (data[i].length > 0 && data[i][1] === email) {
-                    existingUserIndex = i;
-                    break;
-                }
+        for (let i = 0; i < data.length; i++) {
+            if (data[i].length > 0 && normalizeEmail(data[i][1]) === email) {
+                existingUserIndex = i;
+                break;
             }
         }
 
-        // Upload to Google Drive directly using stream
+        // The old photo is removed only after the sheet points at the new one (see end of function)
+        const oldFileId = existingUserIndex !== -1 ? data[existingUserIndex][4] : null;
+
+        // Upload first: if this fails, the existing member record and its photo are left untouched
         const file = req.file;
-
-        // If user exists, delete old image from Google Drive before uploading new one
-        if (existingUserIndex !== -1 && data[existingUserIndex][4]) {
-            try {
-                const auth = await getAuth();
-                const drive = google.drive({ version: "v3", auth });
-                await drive.files.delete({ fileId: data[existingUserIndex][4] });
-                console.log("Old image deleted from Google Drive");
-            } catch (error) {
-                console.log("Error deleting old image:", error.message);
-            }
-        }
-
         const driveResponse = await uploadToGoogleDrive(file.buffer, file.mimetype, `${email}.jpg`);
-
-        // const imageLinkShree = driveResponse.webViewLink;
         const copyImageId = driveResponse.id;
+        newFileId = copyImageId;
 
 
         // Current date in IST, formatted DD-MM-YYYY
@@ -358,6 +364,7 @@ async function createUser(req, res) {
 
         const sheets = await accessGoogleSheet();
         const auth = await getAuth();
+        const rowValues = [[fullName, email, mobileNo, address, copyImageId, formattedDate, afterOneYearDate, dOB, age, bloodGroup, workoutTime, "No", "", "", "No", "No"]];
         let response;
 
         // If user exists, update the existing row with new data
@@ -367,7 +374,7 @@ async function createUser(req, res) {
                 spreadsheetId,
                 range: `UserData!A${existingUserIndex + 2}`,
                 valueInputOption: "USER_ENTERED",
-                resource: { values: [[fullName, email, mobileNo, address, copyImageId, formattedDate, afterOneYearDate, dOB, age, bloodGroup, workoutTime, "No", "", "", "No", "No"]] }
+                resource: { values: rowValues }
             })
         } else {
             // Checking empty rows for new user
@@ -387,7 +394,7 @@ async function createUser(req, res) {
                     spreadsheetId,
                     range: `UserData!A${emptyIndex + 2}`,
                     valueInputOption: "USER_ENTERED",
-                    resource: { values: [[fullName, email, mobileNo, address, copyImageId, formattedDate, afterOneYearDate, dOB, age, bloodGroup, workoutTime, "No", "", "", "No", "No"]] }
+                    resource: { values: rowValues }
                 })
             }
             else {
@@ -396,9 +403,14 @@ async function createUser(req, res) {
                     spreadsheetId,
                     range: "UserData",  //Specify the start cell
                     valueInputOption: "USER_ENTERED",
-                    resource: { values: [[fullName, email, mobileNo, address, copyImageId, formattedDate, afterOneYearDate, dOB, age, bloodGroup, workoutTime, "No", "", "", "No", "No"]] }
+                    resource: { values: rowValues }
                 })
             }
+        }
+
+        // The sheet now references the new photo, so the old one can go
+        if (oldFileId) {
+            await deleteDrivePhoto(oldFileId);
         }
 
         return res.status(200).json({ success: true, Result: response })
@@ -406,6 +418,10 @@ async function createUser(req, res) {
 
     } catch (error) {
         console.log(error.message);
+        // Upload succeeded but the sheet did not take it: drop the new photo so Drive has no orphan
+        if (newFileId) {
+            await deleteDrivePhoto(newFileId);
+        }
         return res.status(500).json({ success: false, Error: "Internal Serval Error Occured!" })
     }
 }
